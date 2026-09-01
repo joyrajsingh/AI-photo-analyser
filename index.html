@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AI Photography Analyzer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background:
+        radial-gradient(circle at top, #1e293b 0%, #020617 55%);
+    }
+
+    .glass {
+      background: rgba(30, 41, 59, 0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .metric-card {
+      transition: transform 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+
+<body class="text-white min-h-screen">
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="text-center pt-10 px-5">
+    <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm">
+      AI Powered Photography
+    </p>
+
+    <h1 class="text-4xl md:text-5xl font-bold mt-3">
+      Photography Analyzer
+    </h1>
+
+    <p class="text-slate-400 mt-3 max-w-xl mx-auto">
+      Upload your photograph and discover its technical quality,
+      improvement tips and creative vibe.
+    </p>
+  </header>
+
+
+  <!-- ================= STEP 1 ================= -->
+
+  <main class="max-w-2xl mx-auto px-5 py-10">
+
+    <section id="step-1" class="glass rounded-2xl p-7 text-center">
+
+      <div class="text-5xl mb-4">
+        📷
+      </div>
+
+      <h2 class="text-2xl font-bold">
+        Upload Your Photograph
+      </h2>
+
+      <p class="text-slate-400 mt-2 mb-6">
+        JPG, JPEG, PNG and other common image formats are supported.
+      </p>
+
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        class="block w-full text-sm text-slate-400
+        file:mr-4 file:py-3 file:px-5
+        file:rounded-xl file:border-0
+        file:bg-indigo-600 file:text-white
+        hover:file:bg-indigo-500 cursor-pointer"
+      >
+
+    </section>
+
+
+    <!-- ================= LOADING ================= -->
+
+    <section
+      id="loading"
+      class="hidden glass rounded-2xl p-8 text-center mt-6"
+    >
+
+      <div class="text-4xl mb-4 animate-pulse">
+        🔍
+      </div>
+
+      <h2 class="text-xl font-bold">
+        Analyzing your photograph...
+      </h2>
+
+      <p class="text-slate-400 mt-2">
+        Please wait while our analyzer examines your image.
+      </p>
+
+    </section>
+
+
+    <!-- ================= MOOD ================= -->
+
+    <section
+      id="moodModal"
+      class="hidden glass rounded-2xl p-7 text-center mt-6"
+    >
+
+      <div class="text-4xl mb-3">
+        🎵
+      </div>
+
+      <h2 class="text-2xl font-bold">
+        Analysis Complete!
+      </h2>
+
+      <p class="text-slate-400 mt-2 mb-6">
+        What mood does this photograph represent?
+      </p>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <button
+          onclick="selectMood('Happy')"
+          class="bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-semibold"
+        >
+          😊 Happy
+        </button>
+
+        <button
+          onclick="selectMood('Sad')"
+          class="bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-semibold"
+        >
+          😔 Sad
+        </button>
+
+        <button
+          onclick="selectMood('Emotional')"
+          class="bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-semibold"
+        >
+          ❤️ Emotional
+        </button>
+
+        <button
+          onclick="selectMood('Energetic')"
+          class="bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-semibold"
+        >
+          ⚡ Energetic
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= STEP 2 ================= -->
+
+    <section id="step-2" class="hidden mt-6">
+
+      <div class="glass rounded-2xl p-6">
+
+        <h2 class="text-2xl font-bold mb-5">
+          📊 Technical Composition
+        </h2>
+
+        <img
+          id="previewImg2"
+          class="w-full max-h-80 object-contain bg-black/30 rounded-xl mb-6"
+        >
+
+        <div class="grid grid-cols-2 gap-4">
+
+          <div class="metric-card bg-slate-800 p-5 rounded-xl">
+            <p class="text-slate-400 text-sm">Brightness</p>
+            <p class="text-2xl font-bold mt-1">
+              <span id="mBrightness">--</span>%
+            </p>
+          </div>
+
+          <div class="metric-card bg-slate-800 p-5 rounded-xl">
+            <p class="text-slate-400 text-sm">Saturation</p>
+            <p class="text-2xl font-bold mt-1">
+              <span id="mSaturation">--</span>%
+            </p>
+          </div>
+
+          <div class="metric-card bg-slate-800 p-5 rounded-xl">
+            <p class="text-slate-400 text-sm">Contrast</p>
+            <p class="text-2xl font-bold mt-1">
+              <span id="mContrast">--</span>
+            </p>
+          </div>
+
+          <div class="metric-card bg-slate-800 p-5 rounded-xl">
+            <p class="text-slate-400 text-sm">Sharpness</p>
+            <p class="text-2xl font-bold mt-1">
+              <span id="mSharpness">--</span>
+            </p>
+          </div>
+
+        </div>
+
+        <button
+          onclick="goToStep(3)"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 mt-6 py-3 rounded-xl font-bold"
+        >
+          Next: Improvement Tips →
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= STEP 3 ================= -->
+
+    <section id="step-3" class="hidden mt-6">
+
+      <div class="glass rounded-2xl p-6">
+
+        <h2 class="text-2xl font-bold mb-5">
+          💡 Improvement Suggestions
+        </h2>
+
+        <ul
+          id="suggestionsList"
+          class="space-y-3"
+        ></ul>
+
+        <button
+          onclick="goToStep(4)"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 mt-6 py-3 rounded-xl font-bold"
+        >
+          Next: Inspirational Quote →
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= STEP 4 ================= -->
+
+    <section id="step-4" class="hidden mt-6">
+
+      <div class="glass rounded-2xl p-8 text-center">
+
+        <div class="text-4xl mb-5">
+          ✨
+        </div>
+
+        <blockquote
+          id="quoteText"
+          class="italic text-2xl leading-relaxed"
+        ></blockquote>
+
+        <button
+          onclick="goToStep(5)"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 mt-7 py-3 rounded-xl font-bold"
+        >
+          View Full Report →
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= STEP 5 ================= -->
+
+    <section
+      id="step-5"
+      class="hidden mt-6"
+    >
+
+      <div class="glass rounded-2xl p-6">
+
+        <h2 class="text-3xl font-bold text-center mb-6">
+          📸 Photo Analysis Report
+        </h2>
+
+        <img
+          id="previewImg5"
+          class="w-full max-h-96 object-contain bg-black/30 rounded-xl mb-7"
+        >
+
+        <div class="mb-7">
+
+          <h3 class="text-xl font-bold text-indigo-400 mb-3">
+            1. Image Metrics
+          </h3>
+
+          <p
+            id="summaryMetrics"
+            class="text-slate-300 leading-7"
+          ></p>
+
+        </div>
+
+
+        <div class="mb-7">
+
+          <h3 class="text-xl font-bold text-indigo-400 mb-3">
+            2. Expert Tips
+          </h3>
+
+          <ul
+            id="summarySuggestions"
+            class="space-y-3"
+          ></ul>
+
+        </div>
+
+
+        <div>
+
+          <h3 class="text-xl font-bold text-indigo-400 mb-3">
+            3. Vibe Quote
+          </h3>
+
+          <p
+            id="summaryQuote"
+            class="italic text-lg text-slate-300"
+          ></p>
+
+        </div>
+
+        <button
+          onclick="location.reload()"
+          class="w-full bg-slate-700 hover:bg-slate-600 mt-8 py-3 rounded-xl font-bold"
+        >
+          Analyze Another Photo
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= AUDIO ================= -->
+
+  <audio
+    id="audioPlayer"
+    class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden"
+    controls
+  ></audio>
+
+
+  <!-- ================= JAVASCRIPT ================= -->
+
+  <script>
+
+    let analysisData = null;
+    let imageSrc = null;
+
+    const MOOD_MUSIC = {
+
+      Happy:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+
+      Sad:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+
+      Emotional:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+
+      Energetic:
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+
+    };
+
+
+    /* ================= IMAGE UPLOAD ================= */
+
+    document
+      .getElementById("imageInput")
+      .addEventListener("change", async function(e) {
+
+        const file = e.target.files[0];
+
+        if (!file) return;
+
+
+        imageSrc = URL.createObjectURL(file);
+
+        document.getElementById("previewImg2").src = imageSrc;
+        document.getElementById("previewImg5").src = imageSrc;
+
+
+        document
+          .getElementById("step-1")
+          .classList.add("hidden");
+
+        document
+          .getElementById("loading")
+          .classList.remove("hidden");
+
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+
+        try {
+
+          const response = await fetch(
+            "http://localhost:8000/analyze",
+            {
+              method: "POST",
+              body: formData
+            }
+          );
+
+
+          if (!response.ok) {
+            throw new Error("Backend error");
+          }
+
+
+          analysisData = await response.json();
+
+
+          if (analysisData.error) {
+            throw new Error(analysisData.error);
+          }
+
+
+          populateData();
+
+
+          document
+            .getElementById("loading")
+            .classList.add("hidden");
+
+          document
+            .getElementById("moodModal")
+            .classList.remove("hidden");
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          document
+            .getElementById("loading")
+            .classList.add("hidden");
+
+          document
+            .getElementById("step-1")
+            .classList.remove("hidden");
+
+          alert(
+            "Backend se connection nahi ho paya. Make sure main.py is running."
+          );
+
+        }
+
+      });
+
+
+    /* ================= MOOD ================= */
+
+    function selectMood(mood) {
+
+      document
+        .getElementById("moodModal")
+        .classList.add("hidden");
+
+
+      const audio =
+        document.getElementById("audioPlayer");
+
+
+      audio.src = MOOD_MUSIC[mood];
+
+      audio.classList.remove("hidden");
+
+
+      audio.play().catch(() => {
+        console.log("Browser autoplay restriction.");
+      });
+
+
+      goToStep(2);
+
+    }
+
+
+    /* ================= POPULATE DATA ================= */
+
+    function populateData() {
+
+      const metrics = analysisData.metrics;
+
+
+      document.getElementById("mBrightness").innerText =
+        metrics.brightness;
+
+      document.getElementById("mSaturation").innerText =
+        metrics.saturation;
+
+      document.getElementById("mContrast").innerText =
+        metrics.contrast;
+
+      document.getElementById("mSharpness").innerText =
+        metrics.sharpness;
+
+
+      const suggestionsList =
+        document.getElementById("suggestionsList");
+
+
+      suggestionsList.innerHTML = "";
+
+
+      analysisData.suggestions.forEach(
+        function(suggestion) {
+
+          const li = document.createElement("li");
+
+          li.className =
+            "bg-slate-800 p-4 rounded-xl text-slate-300";
+
+          li.textContent = "💡 " + suggestion;
+
+          suggestionsList.appendChild(li);
+
+        }
+      );
+
+
+      document.getElementById("quoteText").innerText =
+        `"${analysisData.quote}"`;
+
+
+      document.getElementById("summaryMetrics").innerText =
+        `Brightness: ${metrics.brightness}% | ` +
+        `Saturation: ${metrics.saturation}% | ` +
+        `Contrast: ${metrics.contrast} | ` +
+        `Sharpness: ${metrics.sharpness}`;
+
+
+      const summarySuggestions =
+        document.getElementById("summarySuggestions");
+
+
+      summarySuggestions.innerHTML = "";
+
+
+      analysisData.suggestions.forEach(
+        function(suggestion) {
+
+          const li = document.createElement("li");
+
+          li.className =
+            "bg-slate-800 p-4 rounded-xl text-slate-300";
+
+          li.textContent = "💡 " + suggestion;
+
+          summarySuggestions.appendChild(li);
+
+        }
+      );
+
+
+      document.getElementById("summaryQuote").innerText =
+        `"${analysisData.quote}"`;
+
+    }
+
+
+    /* ================= STEP NAVIGATION ================= */
+
+    function goToStep(stepNum) {
+
+      for (let i = 1; i <= 5; i++) {
+
+        const step =
+          document.getElementById(`step-${i}`);
+
+        if (step) {
+          step.classList.add("hidden");
+        }
+
+      }
+
+
+      document
+        .getElementById(`step-${stepNum}`)
+        .classList.remove("hidden");
+
+    }
+
+  </script>
+
+</body>
+</html>
